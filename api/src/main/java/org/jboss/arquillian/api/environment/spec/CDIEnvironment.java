@@ -9,5 +9,6 @@ import org.jboss.arquillian.api.environment.ProvidedBy;
       "~ org\\.jboss\\.arquillian\\.container\\.weld\\..*",
       "~ org\\.jboss\\.arquillian\\.container\\.openwebbeans\\..*"
    },
-   environments = JavaEE6Environment.class)
+   environments = JavaEE6Environment.class
+)
 public final class CDIEnvironment implements ExecutionEnvironment {}

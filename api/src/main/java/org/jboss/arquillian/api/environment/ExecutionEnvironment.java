@@ -16,9 +16,7 @@ package org.jboss.arquillian.api.environment;
  * 
  * <pre>
  * &#064;ProvidedBy(containers = &quot;&tilde; org\\.jboss\\.arquillian\\.container\\.jbossas\\.(managed|remote|embedded)_6(_[0-9]+)*&quot;)
- * public final class JavaEE6Container implements ExecutionEnvironment
- * {
- * }
+ * public final class JavaEE6Environment implements ExecutionEnvironment {}
  * </pre>
  * 
  * @author Dan Allen
