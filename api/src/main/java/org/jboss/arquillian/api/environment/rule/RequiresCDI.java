@@ -5,10 +5,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.jboss.arquillian.api.environment.RequiresEnvironment;
+import org.jboss.arquillian.api.environment.RequiredEnvironmentStereotype;
 import org.jboss.arquillian.api.environment.spec.CDIEnvironment;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-@RequiresEnvironment(CDIEnvironment.class)
+@CDIEnvironment
+@RequiredEnvironmentStereotype
 public @interface RequiresCDI {}

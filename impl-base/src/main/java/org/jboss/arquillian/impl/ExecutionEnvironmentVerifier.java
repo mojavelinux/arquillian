@@ -4,6 +4,7 @@ import java.lang.annotation.Annotation;
 
 import org.jboss.arquillian.api.environment.ExecutionEnvironment;
 import org.jboss.arquillian.api.environment.ProvidedBy;
+import org.jboss.arquillian.api.environment.RequiredEnvironmentStereotype;
 import org.jboss.arquillian.api.environment.RequiresEnvironment;
 
 // TODO impl cache for targetContainerId -> environments it provides
@@ -20,7 +21,7 @@ public class ExecutionEnvironmentVerifier
 
    public boolean verifyTargetContainerProvidesRequiredEnvironment(Class<?> testClass)
    {
-      Class<? extends ExecutionEnvironment> requiredEnv = resolveRequiredEnvironment(testClass);
+      Class<? extends Annotation> requiredEnv = resolveRequiredEnvironment(testClass);
       if (requiredEnv != null)
       {
          suitable = false;
@@ -39,7 +40,7 @@ public class ExecutionEnvironmentVerifier
       return suitable;
    }
 
-   protected Class<? extends ExecutionEnvironment> resolveRequiredEnvironment(Class<?> testClass)
+   protected Class<? extends Annotation> resolveRequiredEnvironment(Class<?> testClass)
    {
       if (testClass.isAnnotationPresent(RequiresEnvironment.class))
       {
@@ -50,16 +51,23 @@ public class ExecutionEnvironmentVerifier
          for (Annotation candidate : testClass.getAnnotations())
          {
             Class<? extends Annotation> candidateType = candidate.annotationType();
-            if (candidateType.isAnnotationPresent(RequiresEnvironment.class))
+            if (candidateType.isAnnotationPresent(RequiredEnvironmentStereotype.class))
             {
-               return candidateType.getAnnotation(RequiresEnvironment.class).value();
+               for (Annotation metaCandidate : candidateType.getAnnotations())
+               {
+                  Class<? extends Annotation> metaCandidateType = metaCandidate.annotationType();
+                  if (metaCandidateType.isAnnotationPresent(ExecutionEnvironment.class))
+                  {
+                     return metaCandidateType;
+                  }
+               }
             }
          }
       }
       return null;
    }
 
-   protected void verifyContainerProvidesEnvironment(String containerId, Class<? extends ExecutionEnvironment> env)
+   protected void verifyContainerProvidesEnvironment(String containerId, Class<? extends Annotation> env)
    {
       if (!env.isAnnotationPresent(ProvidedBy.class))
       {
@@ -74,7 +82,7 @@ public class ExecutionEnvironmentVerifier
       }
       else
       {
-         for (Class<? extends ExecutionEnvironment> penv : providers.environments())
+         for (Class<? extends Annotation> penv : providers.environments())
          {
             // FIXME verify that we aren't visiting an environment again as optimization and to avoid recursion (in case of user error) 
             verifyContainerProvidesEnvironment(containerId, penv);

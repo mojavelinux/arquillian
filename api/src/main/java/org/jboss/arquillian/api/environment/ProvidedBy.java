@@ -1,11 +1,11 @@
 package org.jboss.arquillian.api.environment;
 
+import java.lang.annotation.Annotation;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-
 
 /**
  * Identifies the containers and runtimes that provide the runtime qualified by
@@ -30,5 +30,5 @@ public @interface ProvidedBy
     * An array of execution environments interfaces collectively providing the
     * runtime qualified by the target annotation.
     */
-   Class<? extends ExecutionEnvironment>[] environments() default {};
+   Class<? extends Annotation>[] environments() default {};
 }
