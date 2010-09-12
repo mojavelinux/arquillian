@@ -31,6 +31,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import com.acme.environment.rule.RequiresJBossAS6;
 
 /**
  * LocalRunServletTestCase
@@ -40,6 +41,7 @@ import org.junit.runner.RunWith;
  */
 @RunWith(Arquillian.class)
 @Run(AS_CLIENT)
+@RequiresJBossAS6 // switch to @RequiresServlet3 when abstract out hostname/port
 public class LocalRunServletTestCase
 {
    @Deployment

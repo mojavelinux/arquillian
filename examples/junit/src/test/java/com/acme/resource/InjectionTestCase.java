@@ -27,6 +27,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import com.acme.environment.rule.RequiresJBossAS5;
+
 /**
  * ResourcesTest
  *
@@ -34,6 +36,7 @@ import org.junit.runner.RunWith;
  * @version $Revision: $
  */
 @RunWith(Arquillian.class)
+@RequiresJBossAS5
 public class InjectionTestCase
 {
    @Deployment

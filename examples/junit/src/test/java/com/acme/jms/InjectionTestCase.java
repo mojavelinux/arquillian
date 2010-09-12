@@ -34,6 +34,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import com.acme.ejb.MessageEcho;
+import com.acme.environment.rule.RequiresJBossAS5;
 import com.acme.util.jms.QueueRequestor;
 
 /**
@@ -43,6 +44,7 @@ import com.acme.util.jms.QueueRequestor;
  * @version $Revision: $
  */
 @RunWith(Arquillian.class)
+@RequiresJBossAS5
 public class InjectionTestCase
 {
    @Deployment

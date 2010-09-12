@@ -21,6 +21,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.jboss.arquillian.impl.DeployableTestBuilder;
 import org.jboss.arquillian.impl.XmlConfigurationBuilder;
@@ -30,6 +31,7 @@ import org.jboss.arquillian.spi.TestResult;
 import org.jboss.arquillian.spi.TestRunnerAdaptor;
 import org.jboss.arquillian.spi.util.TestEnrichers;
 import org.junit.internal.runners.model.MultipleFailureException;
+import org.junit.runner.Description;
 import org.junit.runner.Result;
 import org.junit.runner.notification.RunListener;
 import org.junit.runner.notification.RunNotifier;
@@ -46,6 +48,11 @@ import org.junit.runners.model.Statement;
  */
 public class Arquillian extends BlockJUnit4ClassRunner
 {
+   private static Logger logger = Logger.getLogger(Arquillian.class.getName());
+   
+   private final Class<?> testClass;
+   private boolean ignore = false;
+   
    /*
     * @HACK
     * JUnit Hack:
@@ -71,6 +78,7 @@ public class Arquillian extends BlockJUnit4ClassRunner
    public Arquillian(Class<?> klass) throws InitializationError
    {
       super(klass);
+      this.testClass = klass;
       try
       {
          // first time we're being initialized
@@ -83,7 +91,7 @@ public class Arquillian extends BlockJUnit4ClassRunner
             }
             Configuration configuration = new XmlConfigurationBuilder().build();
             TestRunnerAdaptor adaptor = DeployableTestBuilder.build(configuration);
-            try 
+            try
             {
                // don't set it if beforeSuite fails
                adaptor.beforeSuite();
@@ -104,6 +112,15 @@ public class Arquillian extends BlockJUnit4ClassRunner
    @Override
    public void run(RunNotifier notifier)
    {
+      // optimization would be to prevent starting container if test will be skipped, but then why would you use the container?
+      if(!deployableTest.get().isCompatible(getTestClass().getJavaClass()))
+      {
+         ignore = true;
+         notifier.fireTestIgnored(getDescription());
+         logger.info(testClass.getName() + " ignored since target container does not provide required execution environment");
+         return;
+      }
+      
       notifier.addListener(new RunListener() 
       {
          @Override
@@ -126,14 +143,21 @@ public class Arquillian extends BlockJUnit4ClassRunner
       });
       super.run(notifier);
    }
-
+   
+   /**
+    * Necessary override so that Eclipse does not display test as "unrooted"
+    * in the case it is ignored.
+    */
    @Override
-   // TODO: exclude @Integration test classes
-   protected List<FrameworkMethod> computeTestMethods()
+   public Description getDescription()
    {
-      return super.computeTestMethods();
+      if (ignore)
+      {
+         return Description.createSuiteDescription(testClass);
+      }
+      
+      return super.getDescription();
    }
-
 
    /**
     * Override to allow test methods with arguments

@@ -20,7 +20,10 @@ import java.lang.reflect.Method;
 import java.util.Stack;
 
 import org.jboss.arquillian.impl.context.ContextLifecycleManager;
+import org.jboss.arquillian.impl.context.SuiteContext;
 import org.jboss.arquillian.impl.context.TestContext;
+import org.jboss.arquillian.spi.Configuration;
+import org.jboss.arquillian.spi.ContainerProfile;
 import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.TestMethodExecutor;
 import org.jboss.arquillian.spi.TestResult;
@@ -43,6 +46,7 @@ public class EventTestRunnerAdaptor implements TestRunnerAdaptor
 {
    private ContextLifecycleManager contextLifecycle;
    private Stack<Context> activeContext = new Stack<Context>();
+   private ExecutionEnvironmentVerifier verifier;
    
    public EventTestRunnerAdaptor(ContextLifecycleManager contextLifecycle)
    {
@@ -56,6 +60,18 @@ public class EventTestRunnerAdaptor implements TestRunnerAdaptor
       return activeContext.peek();
    }
    
+   public boolean isCompatible(Class<?> testClass)
+   {
+      // don't check in the case of the slave execution (could optional do this check in the Arquillian class)
+      if (DeployableTestBuilder.getProfile() == ContainerProfile.CONTAINER)
+      {
+         return true;
+      }
+      
+      // Verifier will only be created once per suite
+      return getExecutionEnvironmentVerifier().verifyTargetContainerProvidesRequiredEnvironment(testClass);
+   }
+
    public void beforeSuite() throws Exception
    {
       Context suiteContext = contextLifecycle.createRestoreSuiteContext();
@@ -116,5 +132,24 @@ public class EventTestRunnerAdaptor implements TestRunnerAdaptor
       TestContext context = contextLifecycle.createRestoreTestContext(testMethodExecutor.getInstance());
       context.fire(test);
       return context.get(TestResult.class);
+   }
+   
+   private ExecutionEnvironmentVerifier getExecutionEnvironmentVerifier()
+   {
+      if (verifier == null)
+      {
+         verifier = new ExecutionEnvironmentVerifier(getTargetContainerId());
+      }
+      
+      return verifier;
+   }
+   
+   private String getTargetContainerId()
+   {
+      if (!(getActiveContext() instanceof SuiteContext))
+      {
+         throw new IllegalStateException("Expecting the active context to be a SuiteContext");
+      }
+      return getActiveContext().get(Configuration.class).getActiveContainerConfiguration().getClass().getPackage().getName();
    }
 }

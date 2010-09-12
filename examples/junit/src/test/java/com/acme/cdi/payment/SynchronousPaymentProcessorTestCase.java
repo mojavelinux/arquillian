@@ -17,6 +17,7 @@
 package com.acme.cdi.payment;
 
 import org.jboss.arquillian.api.Deployment;
+import org.jboss.arquillian.api.environment.rule.RequiresCDIEnterprise;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ArchivePaths;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -32,6 +33,7 @@ import org.junit.runner.RunWith;
  * @version $Revision: $
  */
 @RunWith(Arquillian.class)
+@RequiresCDIEnterprise
 public class SynchronousPaymentProcessorTestCase 
 {
 

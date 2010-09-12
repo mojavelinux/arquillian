@@ -20,6 +20,7 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 
 import org.jboss.arquillian.api.Deployment;
+import org.jboss.arquillian.api.environment.rule.RequiresJavaEE6;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ArchivePaths;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -39,6 +40,7 @@ import com.acme.ejb.GreetingManagerBean;
  * @version $Revision: $
  */
 @RunWith(Arquillian.class)
+@RequiresJavaEE6 // technically works with Weld SE, but it's a cheat
 public class InjectionTestCase
 {
    @Deployment

@@ -21,6 +21,7 @@ import javax.ejb.EJB;
 import junit.framework.Assert;
 
 import org.jboss.arquillian.api.Deployment;
+import org.jboss.arquillian.api.environment.rule.RequiresEJB3_1;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
@@ -35,6 +36,7 @@ import org.junit.runner.RunWith;
  * @version $Revision: $
  */
 @RunWith(Arquillian.class)
+@RequiresEJB3_1
 public class NoInterfaceEJBTestCase
 {
    @Deployment

@@ -39,6 +39,12 @@ public interface TestRunnerAdaptor
    Context getActiveContext();
    
    /**
+    * Checks whether the test class about to be executed is compatible
+    * with the execution environment of the test (e.g., the target container)
+    */
+   boolean isCompatible(Class<?> testClass);
+   
+   /**
     * @throws Exception
     */
    void beforeSuite() throws Exception; 

@@ -22,7 +22,7 @@
 	<properties>
 
       	<!-- Versioning -->
-		<version.weld_core>1.0.1-SP1</version.weld_core>
+		<version.weld_core>1.0.1-SP4</version.weld_core>
 		<version.org.apache.openejb_openejb.core>3.1.2</version.org.apache.openejb_openejb.core>
 		<version.openwebbeans>1.0.0-M4</version.openwebbeans>
 		<version.jboss_60>6.0.0.20100721-M4</version.jboss_60>
@@ -127,19 +127,6 @@
 					</dependency>
 				</dependencies>
 			</dependencyManagement>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<configuration>
-							<includes>
-								<include>com/acme/cdi/random/*</include>
-							</includes>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
 		</profile>
 		<profile>
 			<id>weld-ee-embedded</id>
@@ -215,20 +202,6 @@
 					</dependency>
 				</dependencies>
 			</dependencyManagement>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<configuration>
-							<includes>
-								<include>com/acme/cdi/payment/*</include>
-								<include>com/acme/cdi/conversation/*</include>
-							</includes>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
 		</profile>
 		<profile>
 			<id>openwebbeans-embedded</id>
@@ -295,20 +268,6 @@
 					</dependency>
 				</dependencies>
 			</dependencyManagement>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<configuration>
-							<includes>
-								<!--  <include>com/acme/cdi/payment/*</include> Expose bug in openwebbeans-->
-								<include>com/acme/cdi/random/*</include>
-							</includes>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
 		</profile>
 		<profile>
 			<id>jbossas-embedded-6</id>
@@ -425,19 +384,6 @@
 				</dependency>
 			</dependencies>
 			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<configuration>
-							<includes>
-								<include>com/acme/ejb/*</include>
-								<include>com/acme/jms/*</include>
-								<include>com/acme/resources/*</include>
-							</includes>
-						</configuration>
-					</plugin>
-				</plugins>
 				<testResources>
 					<testResource>
 						<directory>src/test/jboss-resources</directory>
@@ -470,19 +416,6 @@
 				</dependency>
 			</dependencies>
 			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<configuration>
-							<includes>
-								<include>com/acme/ejb/*</include>
-								<include>com/acme/jms/*</include>
-								<include>com/acme/resources/*</include>
-							</includes>
-						</configuration>
-					</plugin>
-				</plugins>
 				<testResources>
 					<testResource>
 						<directory>src/test/jboss-resources</directory>
@@ -520,17 +453,6 @@
 						<directory>src/test/jboss-resources</directory>
 					</testResource>
 				</testResources>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<configuration>
-							<excludes>
-								<exclude>com/acme/cdi/conversation/*</exclude>
-							</excludes>
-						</configuration>
-					</plugin>
-				</plugins>
 			</build>
 		</profile>
 		<profile>
@@ -547,24 +469,6 @@
 					<version>${version.glassfish_30}</version>
 				</dependency>
 			</dependencies>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<configuration>
-							<includes>
-								<include>com/acme/ejb/*</include>
-								<include>com/acme/ejb31/*</include>
-								<include>com/acme/cdi/*</include>
-								<include>com/acme/cdi/payment/*</include>
-								<include>com/acme/cdi/random/*</include>
-								<!-- <include>com/acme/web/*</include>  -->
-							</includes>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
 		</profile>
 		<profile>
 			<id>openejb-embedded</id>
@@ -589,22 +493,6 @@
 					<version>${version.org.apache.openejb_openejb.core}</version>
 				</dependency>
 			</dependencies>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<configuration>
-							<includes>
-								<include>com/acme/ejb/*</include>
-							</includes>
-							<excludes>
-								<exclude>**/TemperatureConverterTestCase*</exclude>
-							</excludes>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
 		</profile>
 <!--
 		<profile>

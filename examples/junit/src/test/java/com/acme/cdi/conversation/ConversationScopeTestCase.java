@@ -20,6 +20,7 @@ import javax.enterprise.context.Conversation;
 import javax.inject.Inject;
 
 import org.jboss.arquillian.api.Deployment;
+import org.jboss.arquillian.api.environment.rule.RequiresCDIEnterprise;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ArchivePaths;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -39,6 +40,7 @@ import org.junit.runner.RunWith;
  */
 @Ignore // Revert until 1.1 Weld is released.. https://jira.jboss.org/browse/ARQ-185
 @RunWith(Arquillian.class)
+@RequiresCDIEnterprise
 public class ConversationScopeTestCase
 {
    @Deployment

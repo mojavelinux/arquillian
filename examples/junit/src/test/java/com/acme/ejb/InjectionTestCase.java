@@ -19,6 +19,7 @@ package com.acme.ejb;
 import javax.ejb.EJB;
 
 import org.jboss.arquillian.api.Deployment;
+import org.jboss.arquillian.api.environment.rule.RequiresEJB3;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
@@ -33,6 +34,7 @@ import org.junit.runner.RunWith;
  * @version $Revision: $
  */
 @RunWith(Arquillian.class)
+@RequiresEJB3
 public class InjectionTestCase
 {
    @Deployment

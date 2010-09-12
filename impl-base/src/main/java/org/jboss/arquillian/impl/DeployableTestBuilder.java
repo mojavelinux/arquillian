@@ -97,7 +97,7 @@ public class DeployableTestBuilder
             profileBuilder = new ClientProfileBuilder();
             break;
          default: // TODO: create profile builders dynamic
-            throw new IllegalArgumentException("Unknon profile " + profile);
+            throw new IllegalArgumentException("Unknown profile " + profile);
       }
       return build(profileBuilder, configuration);
    }

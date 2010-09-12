@@ -3,16 +3,18 @@ package com.acme.ejb;
 import javax.ejb.EJB;
 
 import org.jboss.arquillian.api.Deployment;
+import org.jboss.arquillian.api.environment.rule.RequiresJavaEE6;
+import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-@RunWith(org.jboss.arquillian.junit.Arquillian.class)
+@RunWith(Arquillian.class)
+@RequiresJavaEE6 // because EJB uses @Resource injection
 public class TemperatureConverterTestCase 
 {
-
    @EJB
    private TemperatureConverter converter;
 
