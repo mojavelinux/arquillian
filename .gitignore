@@ -3,6 +3,7 @@
 .classpath
 target/
 test-output/
+.gradle/
 transaction.log
 api/.classpath
 api/.project

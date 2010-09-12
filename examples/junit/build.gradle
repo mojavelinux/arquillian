@@ -1,0 +1,103 @@
+apply plugin: JavaPlugin
+
+buildDir = 'target/gradle-build'
+
+library_versions = [
+   junit: '4.8.1', arquillian: '1.0.0.Alpha3', jbossJavaeeSpec: '1.0.0.Beta7', cdi: '1.0-SP1', weld: '1.0.1-Final',
+   slf4j: '1.5.8', log4j: '1.2.14', jbossas: '6.0.0.20100721-M4', glassfish: '3.0.1-b20', openejb: '3.1.2'
+]
+
+repositories {
+   mavenCentral()
+   mavenRepo urls: 'http://repository.jboss.org/nexus/content/groups/public/'
+   mavenRepo urls: 'http://repository.jboss.org/nexus/content/repositories/deprecated'
+}
+
+configurations {
+   // remove compile inheritance to avoid complexities w/ container classpaths
+   runtime.setExtendsFrom([] as Set)
+   testRuntime.setExtendsFrom([runtime] as Set)
+   weldEmbeddedTestRuntime { extendsFrom testRuntime }
+   jbossasRemoteTestRuntime { extendsFrom testRuntime }
+   glassfishEmbeddedTestRuntime { extendsFrom testRuntime }
+   openejbEmbeddedTestRuntime { extendsFrom testRuntime }
+}
+
+dependencies {
+   compile group: 'org.jboss.spec', name: 'jboss-javaee-6.0', version: library_versions.jbossJavaeeSpec
+
+   testCompile group: 'junit', name: 'junit', version: library_versions.junit
+   testCompile group: 'org.jboss.arquillian', name: 'arquillian-junit', version: library_versions.arquillian
+   testCompile group: 'org.jboss.arquillian.example', name: 'arquillian-example-domain', version: library_versions.arquillian
+
+   testRuntime group: 'junit', name: 'junit', version: library_versions.junit
+   testRuntime group: 'org.jboss.arquillian', name: 'arquillian-junit', version: library_versions.arquillian
+   testRuntime group: 'org.jboss.arquillian.example', name: 'arquillian-example-domain', version: library_versions.arquillian
+
+   weldEmbeddedTestRuntime group: 'org.jboss.arquillian.container', name: 'arquillian-weld-ee-embedded-1.1', version: library_versions.arquillian
+   weldEmbeddedTestRuntime group: 'org.jboss.spec', name: 'jboss-javaee-6.0', version: library_versions.jbossJavaeeSpec
+   weldEmbeddedTestRuntime group: 'org.jboss.weld', name: 'weld-core', version: library_versions.weld
+   weldEmbeddedTestRuntime group: 'org.slf4j', name: 'slf4j-log4j12', version: library_versions.slf4j
+   weldEmbeddedTestRuntime group: 'log4j', name: 'log4j', version: library_versions.log4j
+
+   jbossasRemoteTestRuntime group: 'org.jboss.arquillian.container', name: 'arquillian-jbossas-remote-6', version: library_versions.arquillian
+   jbossasRemoteTestRuntime group: 'org.jboss.spec', name: 'jboss-javaee-6.0', version: library_versions.jbossJavaeeSpec
+   jbossasRemoteTestRuntime group: 'org.jboss.jbossas', name: 'jboss-as-server', classifier: 'client', version: library_versions.jbossas, transitive: false
+   jbossasRemoteTestRuntime group: 'org.jboss.jbossas', name: 'jboss-as-profileservice', classifier: 'client', version: library_versions.jbossas
+
+   glassfishEmbeddedTestRuntime group: 'org.jboss.arquillian.container', name: 'arquillian-glassfish-embedded-3', version: library_versions.arquillian
+   glassfishEmbeddedTestRuntime group: 'org.glassfish.extras', name: 'glassfish-embedded-all', version: library_versions.glassfish
+
+   openejbEmbeddedTestRuntime group: 'org.jboss.arquillian.container', name: 'arquillian-openejb-embedded-3.1', version: library_versions.arquillian
+   openejbEmbeddedTestRuntime group: 'javax.enterprise', name: 'cdi-api', version: library_versions.cdi
+   openejbEmbeddedTestRuntime group: 'org.apache.openejb', name: 'openejb-core', version: library_versions.openejb
+}
+
+sourceSets {
+   weldEmbeddedTest {
+      runtimeClasspath = sourceSets.main.classes + configurations.weldEmbeddedTestRuntime
+   }
+   jbossasRemoteTest {
+      runtimeClasspath = sourceSets.main.classes + configurations.jbossasRemoteTestRuntime
+   }
+   glassfishEmbeddedTest {
+      runtimeClasspath = sourceSets.main.classes + configurations.glassfishEmbeddedTestRuntime
+   }
+   openejbEmbeddedTest {
+      runtimeClasspath = sourceSets.main.classes + configurations.openejbEmbeddedTestRuntime
+   }
+}
+
+task weldEmbeddedTest(type: Test) {
+   testResultsDir = new File(testResultsDir, 'weld-embedded')
+   testReportDir = new File(testReportDir, 'weld-embedded')
+   include 'com/acme/cdi/*/*'
+   testClassesDir = sourceSets.test.classesDir
+   classpath = sourceSets.test.classes + sourceSets.weldEmbeddedTest.runtimeClasspath
+}
+
+task jbossasRemoteTest(type: Test) {
+   testResultsDir = new File(testResultsDir, 'jbossas-remote')
+   testReportDir = new File(testReportDir, 'jbossas-remote')
+   exclude 'com/acme/cdi/conversation/*'
+   testClassesDir = sourceSets.test.classesDir
+   classpath = sourceSets.test.classes + files('src/test/jboss-resources') + sourceSets.jbossasRemoteTest.runtimeClasspath
+}
+
+task glassfishEmbeddedTest(type: Test) {
+   testResultsDir = new File(testResultsDir, 'glassfish-embedded')
+   testReportDir = new File(testReportDir, 'glassfish-embedded')
+   include 'com/acme/cdi/**', 'com/acme/ejb*/**'
+   testClassesDir = sourceSets.test.classesDir
+   classpath = sourceSets.test.classes + sourceSets.glassfishEmbeddedTest.runtimeClasspath
+}
+
+task openejbEmbeddedTest(type: Test) {
+   testResultsDir = new File(testResultsDir, 'openejb-embedded')
+   testReportDir = new File(testReportDir, 'openejb-embedded')
+   include 'com/acme/ejb/*'
+   exclude '**/TemperatureConverterTestCase*'
+   scanForTestClasses = false
+   testClassesDir = sourceSets.test.classesDir
+   classpath = sourceSets.test.classes + sourceSets.openejbEmbeddedTest.runtimeClasspath
+}
