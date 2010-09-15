@@ -25,5 +25,18 @@ import java.lang.annotation.Target;
 public @interface RequiresEnvironment
 {
    Class<? extends ExecutionEnvironment> value();
-   String[] configurations() default {};
+   String[] configuration() default "";
+   
+   /**
+    * Wraps one or more required execution environment alternatives. Used when
+    * the required environments are not hierarchically related or when
+    * permitting multiple configurations of one or more environments.
+    */
+   @Retention(RetentionPolicy.RUNTIME)
+   @Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
+   @Documented
+   @interface Alternatives
+   {
+      RequiresEnvironment[] value();
+   }
 }
