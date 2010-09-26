@@ -25,6 +25,8 @@ public class EchoBean implements InitializingBean
 {
    private int volume = 0;
 
+   private String localeKey;
+   
    public String echo(final String message)
    {
       return message;
@@ -38,6 +40,16 @@ public class EchoBean implements InitializingBean
    public void setVolume(int volume)
    {
       this.volume = volume;
+   }
+   
+   public String getLocaleKey()
+   {
+      return localeKey;
+   }
+
+   public void setLocaleKey(String localeKey)
+   {
+      this.localeKey = localeKey;
    }
 
    public void afterPropertiesSet() throws Exception

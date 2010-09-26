@@ -5,8 +5,15 @@
       http://www.springframework.org/schema/beans
       http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
+   <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+      <property name="locations">
+         <value>classpath:defaults.properties</value>
+      </property>
+   </bean>
+
    <bean id="echoBean" class="org.jboss.arquillian.container.spring.embedded_3.bean.EchoBean">
       <property name="volume" value="4"/>
+      <property name="localeKey" value="${defaults.localeKey}"/>
    </bean>
 
  </beans>

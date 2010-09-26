@@ -32,7 +32,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 /**
- * Tests that Spring beans work through the Arquillian lifecycle
+ * Tests that the Spring bean container is bootstrapped by the test and
+ * can see classes and resources in the ShrinkWrap archive.
  * 
  * @author Dan Allen
  * @version $Revision: $
@@ -50,6 +51,7 @@ public class SpringEmbeddedTestCase implements ApplicationContextAware
    {
       return ShrinkWrap.create(JavaArchive.class)
          .addClasses(EchoBean.class, InitializingBean.class)
+         .addResource("test-defaults.properties", "defaults.properties")
          .addResource("applicationContext.xml");
    }
 
@@ -59,7 +61,9 @@ public class SpringEmbeddedTestCase implements ApplicationContextAware
    
    /**
     * Ensures the EchoBean is injected and returns the expected response via
-    * pass-by-reference semantics.
+    * pass-by-reference semantics. Also verify that the bean is properly
+    * initialized, including a post-initialize method and property assignment
+    * via the property placeholder configurer.
     */
    @Test
    public void shouldInjectCorrectEchoBean()
@@ -78,6 +82,8 @@ public class SpringEmbeddedTestCase implements ApplicationContextAware
       log.info("Got expected result from bean: " + received);
 
       Assert.assertEquals("Expected volume to be assigned and incremented", 5, echoBean.getVolume());
+      
+      Assert.assertEquals("en", echoBean.getLocaleKey());
    }
    
    /**
