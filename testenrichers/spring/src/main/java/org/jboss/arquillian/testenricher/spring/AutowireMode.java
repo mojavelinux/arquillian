@@ -37,7 +37,7 @@ public enum AutowireMode
 {
    BY_TYPE("byType", AbstractAutowireCapableBeanFactory.AUTOWIRE_BY_TYPE),
    BY_NAME("byName", AbstractAutowireCapableBeanFactory.AUTOWIRE_BY_NAME),
-   BY_ANNOTATED("byAnnotated", AbstractAutowireCapableBeanFactory.AUTOWIRE_NO),
+   ANNOTATED("annotated", AbstractAutowireCapableBeanFactory.AUTOWIRE_NO),
    DISABLED("disabled", AbstractAutowireCapableBeanFactory.AUTOWIRE_NO);
    
    private String key;

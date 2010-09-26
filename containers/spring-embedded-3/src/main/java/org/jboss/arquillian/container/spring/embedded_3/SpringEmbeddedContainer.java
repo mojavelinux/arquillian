@@ -95,10 +95,10 @@ public class SpringEmbeddedContainer implements DeployableContainer
       {
          AutowireMode autowireMode = springContainerConfig.getAutowireMode();
          boolean markerConfiguration = false;
-         if (!AutowireMode.BY_ANNOTATED.equals(autowireMode) && archive.get(descriptorPath).getAsset().equals(EmptyAsset.INSTANCE))
+         if (!AutowireMode.ANNOTATED.equals(autowireMode) && archive.get(descriptorPath).getAsset().equals(EmptyAsset.INSTANCE))
          {
             markerConfiguration = true;
-            autowireMode = AutowireMode.BY_ANNOTATED;
+            autowireMode = AutowireMode.ANNOTATED;
          }
          GenericApplicationContext applicationCtx = createApplicationContext(autowireMode);
          applicationCtx.setClassLoader(cl);
@@ -107,7 +107,7 @@ public class SpringEmbeddedContainer implements DeployableContainer
             createBeanDefinitionReader(applicationCtx, cl)
                .loadBeanDefinitions(springContainerConfig.getConfigLocation());
          }
-         if (AutowireMode.BY_ANNOTATED.equals(autowireMode) && applicationCtx instanceof AnnotationConfigApplicationContext)
+         if (AutowireMode.ANNOTATED.equals(autowireMode) && applicationCtx instanceof AnnotationConfigApplicationContext)
          {
             ((AnnotationConfigApplicationContext) applicationCtx).scan(springContainerConfig.getScanBasePackage());
          }
@@ -133,7 +133,7 @@ public class SpringEmbeddedContainer implements DeployableContainer
 
    protected GenericApplicationContext createApplicationContext(AutowireMode autowire)
    {
-      if (AutowireMode.BY_ANNOTATED.equals(autowire))
+      if (AutowireMode.ANNOTATED.equals(autowire))
       {
          return new AnnotationConfigApplicationContext();
       }

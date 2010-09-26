@@ -88,14 +88,14 @@ public class SpringEmbeddedConfiguration implements ContainerConfiguration
     * <li>byName - injects a bean with the id equivalent to the name of the bean
     * property</li>
     * <li>byType - injects a bean with the same type as the bean property</li>
-    * <li>byAnnotated - injects a bean based on the @Autowired or @Inject
+    * <li>annotated - injects a bean based on the @Autowired or @Inject
     * annotations</li>
     * <li>disabled - dependency injection disabled</li>
     * </ul>
     * 
     * <p>
     * Defaults to "byType". An empty Spring configuration file in the archive
-    * automatically changes the strategy to "byAnnotated".
+    * automatically changes the strategy to "annotated".
     * </p>
     * 
     * <p>
@@ -125,7 +125,7 @@ public class SpringEmbeddedConfiguration implements ContainerConfiguration
     * points.
     * 
     * <p>
-    * Only relevant when the value of <code>autowire</code> is "byAnnotated".
+    * Only relevant when the value of <code>autowire</code> is "annotated".
     * Defaults to empty string, which scans all packages in archive.
     * </p>
     * 
