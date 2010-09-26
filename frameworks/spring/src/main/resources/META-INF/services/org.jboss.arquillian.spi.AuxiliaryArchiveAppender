@@ -1,0 +1,2 @@
+org.jboss.arquillian.framework.spring.SpringIntegrationAuxiliaryArchiveAppender
+org.jboss.arquillian.framework.spring.SpringLibrariesAuxiliaryArchiveAppender

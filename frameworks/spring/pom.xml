@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+   <parent>
+      <groupId>org.jboss.arquillian</groupId>
+      <artifactId>arquillian-build</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+      <relativePath>../../build/pom.xml</relativePath>
+   </parent>
+
+   <modelVersion>4.0.0</modelVersion>
+
+   <groupId>org.jboss.arquillian.framework</groupId>
+   <artifactId>arquillian-framework-spring</artifactId>
+   <name>Arquillian Framework: Spring</name>
+   <description>Spring framework integration for in-container Arquillian tests run against remote containers</description>
+
+   <properties>
+      <version.jbossas>6.0.0.20100721-M4</version.jbossas>
+      <version.spring>3.0.1.RELEASE</version.spring>
+      <version.jetty>8.0.0.M0</version.jetty>
+      <version.jbossas_manager>1.0.3.GA</version.jbossas_manager>
+   </properties>
+
+   <dependencies>
+
+      <dependency>
+         <groupId>org.jboss.arquillian</groupId>
+         <artifactId>arquillian-spi</artifactId>
+         <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+         <groupId>org.jboss.arquillian.testenricher</groupId>
+         <artifactId>arquillian-testenricher-spring</artifactId>
+         <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+         <groupId>org.jboss.shrinkwrap</groupId>
+         <artifactId>shrinkwrap-impl-base</artifactId>
+      </dependency>
+
+      <dependency>
+         <groupId>org.jboss.shrinkwrap</groupId>
+         <artifactId>shrinkwrap-spi</artifactId>
+      </dependency>
+
+      <dependency>
+         <groupId>junit</groupId>
+         <artifactId>junit</artifactId>
+         <scope>test</scope>
+      </dependency>
+
+      <dependency>
+         <groupId>org.jboss.arquillian</groupId>
+         <artifactId>arquillian-junit</artifactId>
+         <version>${project.version}</version>
+         <scope>test</scope>
+      </dependency>
+
+      <dependency>
+         <groupId>org.springframework</groupId>
+         <artifactId>spring-web</artifactId>
+         <version>${version.spring}</version>
+         <scope>provided</scope>
+      </dependency>
+
+   </dependencies>
+
+   <build>
+      <plugins>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <version>2.1</version>
+            <executions>
+               <execution>
+                  <id>copy-spring-libs</id>
+                  <phase>process-test-resources</phase>
+                  <configuration>
+                     <includeScope>provided</includeScope>
+                     <outputDirectory>${project.build.directory}/spring-libs</outputDirectory>
+                     <stripVersion>true</stripVersion>
+                  </configuration>
+                  <goals>
+                     <goal>copy-dependencies</goal>
+                  </goals>
+               </execution>
+            </executions>
+         </plugin>
+      </plugins>
+   </build>
+
+   <profiles>
+      <profile>
+         <id>arq-jetty-embedded</id>
+         <activation>
+            <activeByDefault>true</activeByDefault>
+         </activation>
+         <dependencies>
+            <dependency>
+               <groupId>org.jboss.arquillian.container</groupId>
+               <artifactId>arquillian-jetty-embedded-7</artifactId>
+               <version>${project.version}</version>
+               <scope>test</scope>
+            </dependency>
+            <dependency>
+               <groupId>org.eclipse.jetty</groupId>
+               <artifactId>jetty-webapp</artifactId>
+               <version>${version.jetty}</version>
+               <scope>test</scope>
+            </dependency>
+            <!-- FIXME shouldn't be required if we aren't using @Resource -->
+            <dependency>
+               <groupId>org.eclipse.jetty</groupId>
+               <artifactId>jetty-plus</artifactId>
+               <version>${version.jetty}</version>
+               <scope>test</scope>
+            </dependency>
+            <!-- FIXME why? -->
+            <dependency>
+               <groupId>javax.enterprise</groupId>
+               <artifactId>cdi-api</artifactId>
+               <version>1.0-SP1</version>
+               <scope>test</scope>
+            </dependency>
+         </dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<excludes>
+                        <!-- requires a remote jvm context -->
+								<exclude>**/UnavailableSpringBeanInContainerTestCase*</exclude>
+							</excludes>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+      </profile>
+
+      <profile>
+         <id>arq-jbossas-managed</id>
+         <dependencies>
+            <dependency>
+               <groupId>org.jboss.arquillian.container</groupId>
+               <artifactId>arquillian-jbossas-managed-6</artifactId>
+               <version>${project.version}</version>
+               <scope>test</scope>
+            </dependency>
+
+            <dependency>
+               <groupId>org.jboss.jbossas</groupId>
+               <artifactId>jboss-as-client</artifactId>
+               <version>${version.jbossas}</version>
+               <type>pom</type>
+               <scope>test</scope>
+            </dependency>
+
+            <dependency>
+               <groupId>org.jboss.jbossas</groupId>
+               <artifactId>jboss-server-manager</artifactId>
+               <version>${version.jbossas_manager}</version>
+               <scope>test</scope>
+            </dependency>
+
+            <!-- why? -->
+            <dependency>
+               <groupId>javax.enterprise</groupId>
+               <artifactId>cdi-api</artifactId>
+               <version>1.0-SP1</version>
+               <scope>test</scope>
+            </dependency>
+         </dependencies>
+         <build>
+            <testResources>
+               <testResource>
+                  <directory>src/test/resources</directory>
+               </testResource>
+               <testResource>
+                  <directory>src/test/resources-jbossas</directory>
+               </testResource>
+            </testResources>
+         </build>
+      </profile>
+
+      <profile>
+         <id>arq-jbossas-remote</id>
+         <dependencies>
+            <dependency>
+               <groupId>org.jboss.arquillian.container</groupId>
+               <artifactId>arquillian-jbossas-remote-6</artifactId>
+               <version>${project.version}</version>
+               <scope>test</scope>
+            </dependency>
+
+            <dependency>
+               <groupId>org.jboss.jbossas</groupId>
+               <artifactId>jboss-as-client</artifactId>
+               <version>${version.jbossas}</version>
+               <type>pom</type>
+               <scope>test</scope>
+            </dependency>
+
+            <!-- why? -->
+            <dependency>
+               <groupId>javax.enterprise</groupId>
+               <artifactId>cdi-api</artifactId>
+               <version>1.0-SP1</version>
+               <scope>test</scope>
+            </dependency>
+         </dependencies>
+         <build>
+            <testResources>
+               <testResource>
+                  <directory>src/test/resources</directory>
+               </testResource>
+               <testResource>
+                  <directory>src/test/resources-jbossas</directory>
+               </testResource>
+            </testResources>
+         </build>
+      </profile>
+   </profiles>
+
+<!--
+vi:ts=3:sw=3:expandtab:
+-->
+</project>
