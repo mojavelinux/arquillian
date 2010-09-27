@@ -20,6 +20,7 @@ import org.jboss.arquillian.spi.AuxiliaryArchiveAppender;
 import org.jboss.arquillian.spi.ClassContextAppender;
 import org.jboss.arquillian.spi.TestEnricher;
 import org.jboss.arquillian.testenricher.spring.SpringTestEnricher;
+import org.jboss.arquillian.testenricher.spring.AutowireMode;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
@@ -37,7 +38,7 @@ public class SpringIntegrationAuxiliaryArchiveAppender implements AuxiliaryArchi
    public Archive<?> createAuxiliaryArchive()
    {
       return ShrinkWrap.create(JavaArchive.class, "arquillian-spring-int.jar")
-         .addClasses(SpringTestEnricher.class, SpringConfigurableApplicationContextAppender.class)
+         .addClasses(SpringTestEnricher.class, AutowireMode.class, SpringConfigurableApplicationContextAppender.class)
          .addServiceProvider(TestEnricher.class, SpringTestEnricher.class)
          .addServiceProvider(ClassContextAppender.class, SpringConfigurableApplicationContextAppender.class)
          .addManifestResource("web-fragment.xml");

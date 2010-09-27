@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.zip.ZipFile;
 
+import org.springframework.OrgSpringframework;
 import org.jboss.arquillian.spi.AuxiliaryArchiveAppender;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ArchivePath;
@@ -39,8 +40,6 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
  */
 public class SpringLibrariesAuxiliaryArchiveAppender implements AuxiliaryArchiveAppender
 {
-   public static final String SPRING_FRAMEWORK_BASE_PACKAGE = "org.springframework";
-   
    public static final String SPRING_LIBRARIES_PATH_PROPERTY = "arquillian.springLibrariesPath";
    
    public static final String DEFAULT_SPRING_LIBRARIES_PATH = "target/spring-libs";
@@ -48,24 +47,32 @@ public class SpringLibrariesAuxiliaryArchiveAppender implements AuxiliaryArchive
    public Archive<?> createAuxiliaryArchive()
    {
       final JavaArchive archive = ShrinkWrap.create(JavaArchive.class, "arquillian-spring-libs.jar");
+      String strategy = "jars";
       // Play some tricks to get ShrinkWrap to transfer classes w/o attempting to load them
-      archive.addPackages(true, new Filter<ArchivePath>() {
+      if (strategy.equals("classes"))
+      {
+         archive.addPackages(true, new Filter<ArchivePath>() {
 
-         public boolean include(ArchivePath classNamePath)
-         {
-            String classResource = classNamePath.get().substring(1);
-            URL resource = Thread.currentThread().getContextClassLoader().getResource(classResource);
-            // not sure why it's null sometimes
-            if (resource != null)
+            public boolean include(ArchivePath classNamePath)
             {
-               archive.addResource(resource, classResource);
+               String classResource = classNamePath.get().substring(1);
+               URL resource = Thread.currentThread().getContextClassLoader().getResource(classResource);
+               System.out.println(resource);
+               // not sure why it's null sometimes
+               if (resource != null)
+               {
+                  archive.addResource(resource, classResource);
+               }
+               return false;
             }
-            return false;
-         }
-         
-      }, Package.getPackage(SPRING_FRAMEWORK_BASE_PACKAGE));
+            
+         }, OrgSpringframework.class.getPackage());
+      }
       // Another approach to transferring classes
-      //mergeJars(archive, getSpringLibrariesPath());
+      else if (strategy.equals("jars"))
+      {
+         mergeJars(archive, getSpringLibrariesPath());
+      }
       return archive;
    }
    
