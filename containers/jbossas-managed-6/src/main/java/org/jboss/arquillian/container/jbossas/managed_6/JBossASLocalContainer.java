@@ -21,7 +21,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.management.ObjectName;
 
 import org.jboss.arquillian.protocol.servlet_3.ServletMethodExecutor;
 import org.jboss.arquillian.spi.Configuration;
@@ -48,9 +51,13 @@ public class JBossASLocalContainer implements DeployableContainer
 {
    private static Logger log = Logger.getLogger(JBossASLocalContainer.class.getName());
 
+   public static final String RECYCLE_RUNNING_PROCESS_PROPERTY = "arquillian.container.recycleProcess";
+   
    private JBossASConfiguration configuration;
 
    protected ServerManager manager;
+   
+   private boolean recycleProcess;
 
    private final List<String> failedUndeployments = new ArrayList<String>();
 
@@ -61,6 +68,7 @@ public class JBossASLocalContainer implements DeployableContainer
    {
       this.configuration = configuration.getContainerConfig(JBossASConfiguration.class);
       
+      recycleProcess = Boolean.getBoolean(RECYCLE_RUNNING_PROCESS_PROPERTY);
       manager = createAndConfigureServerManager();
    }
    
@@ -72,16 +80,27 @@ public class JBossASLocalContainer implements DeployableContainer
       try
       {
          Server server = manager.getServer(configuration.getProfileName());
-         if(ServerController.isServerStarted(server))
+
+         if (ServerController.isServerStarted(server))
          {
-            throw new LifecycleException(
-            		"The server is already running! " +
-            		"Managed containers does not support connecting to running server instances due to the " +
-            		"possible harmfull effect of connecting to the wrong server. Please stop server before running or " +
-            		"change to another type of container.");
+            if (!recycleProcess || !isArquillianManaged(server))
+            {
+               throw new LifecycleException(
+               		"The server is already running! " +
+               		"Managed containers do not support connecting to running server instances by default due to the " +
+               		"possible harmful effect of connecting to the wrong server. Please stop server first or " +
+               		"set the " + RECYCLE_RUNNING_PROCESS_PROPERTY + " system property to true.");
+            }
+            else
+            {
+               // TODO perhaps report more info about what process was used (name, version, etc)
+               log.info("Recycling running JBoss AS process managed by Arquillian");
+            }
          }
-         
-         manager.startServer(server.getName());
+         else
+         {
+            manager.startServer(server.getName());
+         }
       }
       catch (IOException e)
       {
@@ -95,7 +114,7 @@ public class JBossASLocalContainer implements DeployableContainer
    public void stop(Context context) throws LifecycleException
    {
       Server server = manager.getServer(configuration.getProfileName());
-      if(!server.isRunning())
+      if(!recycleProcess && !server.isRunning())
       {
          throw new LifecycleException("Can not stop server. Server is not started");
       }
@@ -108,13 +127,22 @@ public class JBossASLocalContainer implements DeployableContainer
          throw new LifecycleException("Could not clean up failed undeployments", e);
       }
       
-      try
+      if (recycleProcess)
       {
-         manager.stopServer(server.getName());
-      } 
-      catch (Exception e) 
+         log.info("Leaving JBoss AS process running to recycle it for subsequent test executions");
+         // tricks server controller into thinking this process is stopped
+         server.setProcess(null);
+      }
+      else
       {
-         throw new LifecycleException("Could not stop server", e);
+         try
+         {
+            manager.stopServer(server.getName());
+         } 
+         catch (Exception e) 
+         {
+            throw new LifecycleException("Could not stop server", e);
+         }
       }
    }
 
@@ -254,8 +282,35 @@ public class JBossASLocalContainer implements DeployableContainer
       prop.setKey("java.endorsed.dirs");
       prop.setValue(new File(configuration.getJbossHome(), "lib/endorsed").getAbsolutePath());
       server.addSysProperty(prop);
+      prop = new Property();
+      prop.setKey("org.jboss.server.manager");
+      prop.setValue("arquillian");
+      server.addSysProperty(prop);
       
       return server;
+   }
+   
+   /**
+    * Check to see if this server reports itself as being managed by Arquillian. This is marked
+    * using system property.
+    */
+   protected boolean isArquillianManaged(Server server)
+   {
+      boolean arquillianManaged = false;
+      try
+      {
+         String value = (String) server.invoke(new ObjectName("jboss.system", "type", "ServerConfig"), "getProperty",
+               new String[] {"org.jboss.server.manager"}, new String[] {String.class.getName()});
+         if ("arquillian".equals(value))
+         {
+            arquillianManaged = true;
+         }
+      }
+      catch (Exception e)
+      {
+         log.log(Level.WARNING, "Could not determine if Arquillian is managing the JBoss AS process", e);
+      }
+      return arquillianManaged;
    }
 
    private void setServerVMArgs(Server server, String arguments)
