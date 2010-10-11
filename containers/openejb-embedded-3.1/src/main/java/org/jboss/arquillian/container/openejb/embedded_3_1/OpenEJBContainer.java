@@ -16,6 +16,7 @@
  */
 package org.jboss.arquillian.container.openejb.embedded_3_1;
 
+import java.lang.reflect.Field;
 import java.util.logging.Logger;
 
 import org.apache.openejb.NoSuchApplicationException;
@@ -55,6 +56,12 @@ public class OpenEJBContainer implements DeployableContainer
     */
    private static final Logger log = Logger.getLogger(OpenEJBContainer.class.getName());
 
+   /**
+    * The field name of the deployment path changed between OpenEJB 3.1 and OpenEJB 3.1. Use
+    * reflection hack to support both APIs.
+    */
+   private static String[] APP_INFO_PATH_FIELD_NAMES = { "jarPath", "path" };
+   
    //-------------------------------------------------------------------------------------||
    // Instance Members -------------------------------------------------------------------||
    //-------------------------------------------------------------------------------------||
@@ -73,6 +80,8 @@ public class OpenEJBContainer implements DeployableContainer
     * The deployment
     */
    private AppInfo deployment;
+   
+   private Field appInfoPathField;
 
    private OpenEJBConfiguration configuration;
    
@@ -83,6 +92,22 @@ public class OpenEJBContainer implements DeployableContainer
    public void setup(Context context, Configuration configuration)
    {
       this.configuration = configuration.getContainerConfig(OpenEJBConfiguration.class);
+      appInfoPathField = null;
+      for (String candidate : APP_INFO_PATH_FIELD_NAMES)
+      {
+         try
+         {
+            appInfoPathField = AppInfo.class.getField(candidate);
+            break;
+         }
+         catch (NoSuchFieldException e) {}
+      }
+      
+      if (appInfoPathField == null)
+      {
+         // perhaps make a ConfigurationException for this type of problem?
+         throw new RuntimeException("Incompatible version of OpenEJB container. Cannot determine field for application path.");
+      }
    }
    
    public ContainerMethodExecutor deploy(Context context, final Archive<?> archive) throws DeploymentException
@@ -142,7 +167,16 @@ public class OpenEJBContainer implements DeployableContainer
       // Undeploy the archive
       try
       {
-         assembler.destroyApplication(deployment.jarPath);
+         String path;
+         try
+         {
+            path = String.class.cast(appInfoPathField.get(deployment));
+         }
+         catch (Exception e)
+         {
+            throw new UndeployException("Could not access field " + appInfoPathField.getName() + " on AppInfo class");
+         }
+         assembler.destroyApplication(path);
       }
       catch (final UndeployException e)
       {
