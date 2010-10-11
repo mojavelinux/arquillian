@@ -35,7 +35,7 @@ public class ProtocolDeploymentAppender implements AuxiliaryArchiveAppender
 {
    public Archive<?> createAuxiliaryArchive()
    {
-      return ShrinkWrap.create(JavaArchive.class, "arquillian-protocol.war")
+      return ShrinkWrap.create(JavaArchive.class, "arquillian-protocol.jar")
             .addManifestResource(ProtocolDeploymentAppender.class.getPackage(), "auxiliary-web.xml", "auxiliary-web.xml")
             .addClasses(SecurityActions.class, ServletTestRunner.class);
    }

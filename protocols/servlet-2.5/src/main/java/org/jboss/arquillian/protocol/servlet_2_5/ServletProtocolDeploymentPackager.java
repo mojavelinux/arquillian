@@ -103,6 +103,7 @@ public class ServletProtocolDeploymentPackager implements DeploymentPackager
    private Archive<?> handleArchive(EnterpriseArchive applicationArchive, Collection<Archive<?>> auxiliaryArchives, Archive<?> protocol)
    {
       WebArchive applicationWebArchive = null;
+      // FIXME it would be helpful if we had a getContentByType() operation
       Map<ArchivePath, Node> rootNodes = applicationArchive.getContent(new Filter<ArchivePath>()
       {
          public boolean include(ArchivePath object)
@@ -169,7 +170,7 @@ public class ServletProtocolDeploymentPackager implements DeploymentPackager
       }
       catch (Exception e)
       {
-         throw new RuntimeException("Failed to merge protocol web-fragment.xml into application web.xml: ", e);
+         throw new RuntimeException("Failed to merge protocol's auxiliary-web.xml into application web.xml: ", e);
       }
    }
 }
