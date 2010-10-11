@@ -19,29 +19,25 @@ package org.jboss.arquillian.protocol.servlet_2_5;
 import org.jboss.arquillian.spi.AuxiliaryArchiveAppender;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.jboss.shrinkwrap.api.spec.JavaArchive;
 
 /**
  * ProtocolDeploymentAppender
  * 
- * DeploymentAppender to add required resources for the protocol servlet to run  
+ * DeploymentAppender to add required resources for the protocol servlet to run
  * in container.
- *
+ * 
  * @author <a href="mailto:aslak@conduct.no">Aslak Knutsen</a>
+ * @author Dan Allen
  * @version $Revision: $
  */
 public class ProtocolDeploymentAppender implements AuxiliaryArchiveAppender
 {
-
    public Archive<?> createAuxiliaryArchive()
    {
-      WebArchive archive = ShrinkWrap.create(WebArchive.class, "arquillian-protocol.war")
-                     .setWebXML("org/jboss/arquillian/protocol/servlet_2_5/web.xml")
-                     .addClasses(
-                           SecurityActions.class,
-                           ServletTestRunner.class
-                     );
-      return archive;
+      return ShrinkWrap.create(JavaArchive.class, "arquillian-protocol.war")
+            .addManifestResource(ProtocolDeploymentAppender.class.getPackage(), "web-fragment.xml", "web-fragment.xml")
+            .addClasses(SecurityActions.class, ServletTestRunner.class);
    }
 
 }
