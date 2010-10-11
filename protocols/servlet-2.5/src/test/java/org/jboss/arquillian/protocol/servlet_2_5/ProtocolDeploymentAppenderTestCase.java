@@ -37,10 +37,8 @@ public class ProtocolDeploymentAppenderTestCase
       Archive<?> archive = new ProtocolDeploymentAppender().createAuxiliaryArchive();
       
       Assert.assertTrue(
-            "Should have added web.xml",
-            archive.contains(ArchivePaths.create("WEB-INF/web.xml"))
+            "Should have added auxiliary-web.xml as manifest resource",
+            archive.contains(ArchivePaths.create("META-INF/auxiliary-web.xml"))
       );
-      
-      System.out.println(archive.toString(true));
    }
 }

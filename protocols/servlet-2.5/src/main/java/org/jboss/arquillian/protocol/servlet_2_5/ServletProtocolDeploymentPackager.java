@@ -54,8 +54,7 @@ import org.w3c.dom.NodeList;
 public class ServletProtocolDeploymentPackager implements DeploymentPackager
 {
    // NOTE we don't want to merge just any web fragment because that could mislead the test writer
-   // QUESTION should we name it arquillian-web-fragment.xml so that we can pick up a descriptor from any auxiliary archive?
-   private static final ArchivePath PROTOCOL_WEB_FRAGMENT_XML_JAR_PATH = ArchivePaths.create("META-INF/protocol-web-fragment.xml");
+   private static final ArchivePath AUXILARY_WEB_XML_JAR_PATH = ArchivePaths.create("META-INF/auxiliary-web.xml");
    
    private static final ArchivePath WEB_XML_WAR_PATH = ArchivePaths.create("WEB-INF/web.xml");
    
@@ -132,18 +131,18 @@ public class ServletProtocolDeploymentPackager implements DeploymentPackager
    
    private WebArchive importProtocolArchive(WebArchive to, Archive<?> protocol)
    {
-      if (protocol.contains(PROTOCOL_WEB_FRAGMENT_XML_JAR_PATH))
+      if (protocol.contains(AUXILARY_WEB_XML_JAR_PATH))
       {
          if (to.contains(WEB_XML_WAR_PATH))
          {
             to.setWebXML(mergeWebXmlFragment(to.get(WEB_XML_WAR_PATH).getAsset(),
-                  protocol.get(PROTOCOL_WEB_FRAGMENT_XML_JAR_PATH).getAsset()));
+                  protocol.get(AUXILARY_WEB_XML_JAR_PATH).getAsset()));
          }
          else
          {
-            to.setWebXML(protocol.get(PROTOCOL_WEB_FRAGMENT_XML_JAR_PATH).getAsset());
+            to.setWebXML(protocol.get(AUXILARY_WEB_XML_JAR_PATH).getAsset());
          }
-         protocol.delete(PROTOCOL_WEB_FRAGMENT_XML_JAR_PATH);
+         protocol.delete(AUXILARY_WEB_XML_JAR_PATH);
       }
       to.addLibrary(protocol);
       return to;

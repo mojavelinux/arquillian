@@ -54,7 +54,7 @@ public class ServletProtocolDeploymentPackagerTestCase
             EnterpriseArchive.class.isInstance(archive));
 
       Assert.assertTrue(
-            "Verify that the auxiliaryArchives EE Modules are placed in /",
+            "Verify that the auxiliaryArchives EE Modules are placed in /lib",
             archive.contains(ArchivePaths.create("/lib/auxiliaryArchive1.jar")));
       
       Assert.assertTrue(
@@ -66,15 +66,33 @@ public class ServletProtocolDeploymentPackagerTestCase
             archive.contains(ArchivePaths.create("/applicationArchive.jar")));
    }
    
-   // as of now, War inside War is not supported. need to merge ? 
-   @Test(expected = IllegalArgumentException.class)
+   @Test
    public void shouldHandleWebArchive() throws Exception
    {
-      new ServletProtocolDeploymentPackager().generateDeployment(
+      Archive<?> archive = new ServletProtocolDeploymentPackager().generateDeployment(
             new TestDeployment(
                   ShrinkWrap.create(WebArchive.class, "applicationArchive.war"), 
                   createAuxiliaryArchives()));
       
+      Assert.assertTrue(
+            "Verify that a defined WebArchive using EE5 WebArchive protocol is build as EnterpriseArchive",
+            WebArchive.class.isInstance(archive));
+      
+      Assert.assertTrue(
+            "Verify that the auxiliaryArchives EE Modules are placed in /WEB-INF/lib",
+            archive.contains(ArchivePaths.create("/WEB-INF/lib/auxiliaryArchive1.jar")));
+      
+      Assert.assertTrue(
+            "Verify that the auxiliaryArchives are placed in /WEB-INF/lib",
+            archive.contains(ArchivePaths.create("/WEB-INF/lib/auxiliaryArchive2.jar")));
+      
+      Assert.assertTrue(
+            "Verify that the auxiliaryArchives are placed in /WEB-INF/lib",
+            archive.contains(ArchivePaths.create("/WEB-INF/lib/arquillian-protocol.war")));
+      
+      Assert.assertTrue(
+            "Verify that the archive contains a web.xml",
+            archive.contains(ArchivePaths.create("/WEB-INF/web.xml")));
    }
 
    @Test
@@ -86,8 +104,8 @@ public class ServletProtocolDeploymentPackagerTestCase
                   createAuxiliaryArchives()));
 
       Assert.assertTrue(
-            "Verify that the auxiliaryArchives are placed in /",
-            archive.contains(ArchivePaths.create("arquillian-protocol.war")));
+            "Verify that the protocol archive is placed in /",
+            archive.contains(ArchivePaths.create("/test.war")));
       
       Assert.assertTrue(
             "Verify that the auxiliaryArchives are placed in /lib",

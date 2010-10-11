@@ -64,7 +64,10 @@
       <dependency>
          <groupId>org.jboss.shrinkwrap</groupId>
          <artifactId>shrinkwrap-impl-base</artifactId>
+         <!-- compile-time dependency because we need ArchiveAsset, which is in impl -->
+         <!--
          <scope>test</scope>
+         -->
       </dependency>
 
    </dependencies>
